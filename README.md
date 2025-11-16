@@ -298,7 +298,7 @@ Este proyecto es de uso educativo. Distribuido bajo licencia **Creative Commons 
 ## 📞 Contacto
 
 **Desarrolladora:** Laura Fernández del Moral Romero  
-**GitHub:** [@RepositorioDelProyecto]([https://github.com/LauraFmr](https://github.com/LauraFmr/tienda-velas-php))  
+**GitHub:** [@RepositorioDelProyecto]([https://github.com/LauraFmr/tienda-velas-php])  
 
 
 ---
