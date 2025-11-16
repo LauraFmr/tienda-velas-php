@@ -36,7 +36,7 @@ include __DIR__ . '/header.php';
             <label class="form-label">Nueva imagen (JPG/PNG)</label>
             <input type="file" name="imagen" class="form-control" accept="image/png, image/jpeg" required>
             <div class="mt-3">
-                <a class="btn btn-secondary" href="/details.php?id=<?= $p->id ?>">Cancelar</a>
+                <a class="btn btn-secondary" href="/details.php?id=<?= $p->id ?>">Ver detalles</a>
                 <button class="btn btn-warning">Subir</button>
             </div>
         </div>

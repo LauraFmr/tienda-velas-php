@@ -25,4 +25,4 @@ if ($p) {
     }
     $pSrv->deleteById($id);
 }
-header('Location:/index.php');
+header('Location:/index.php'); // refresca la lista de productos

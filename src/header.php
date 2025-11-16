@@ -47,7 +47,7 @@ $user = $session->user();
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark mb-4">
     <div class="container">
-      <a class="navbar-brand brand" href="/index.php"><img src="/uploads/logo-candle-mellon.png" alt="Logo" style="height: 50px; margin-right: 12px;"> Candle Mellon - Velas de Fantasía</a>
+      <a class="navbar-brand brand" href="/index.php"><img class="rounded" src="/uploads/logo-candle-mellon.png" alt="Logo" style="height: 80px; margin-right: 12px;"> Candle Mellon - Velas de Fantasía</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nv"><span class="navbar-toggler-icon"></span></button>
       <div id="nv" class="collapse navbar-collapse">
         <ul class="navbar-nav me-auto">

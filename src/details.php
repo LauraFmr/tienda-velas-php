@@ -8,18 +8,18 @@ use config\Config;
 use services\ProductosService;
 use services\SessionService;
 
-$config = Config::getInstance();
-$srv = new ProductosService($config->db);
-$session = SessionService::getInstance();
-$id = (int)($_GET['id'] ?? 0);
-$p = $srv->findById($id);
+$config = Config::getInstance(); // instancia de la base de datos
+$srv = new ProductosService($config->db); //instancia de servicio de productos
+$session = SessionService::getInstance(); // instancia del servicio de sesión
+$id = (int)($_GET['id'] ?? 0); // obtengo el id del producto de la URL
+$p = $srv->findById($id); // almaceno toda la información de un producto
 if (!$p) {
     header('Location: /index.php');
     exit;
 }
 include __DIR__ . '/header.php';
 ?>
-<h1 class="h3 mb-3">Producto #<?= $p->id ?></h1>
+<h1 class="h3 mb-3">Producto: <?= $p->nombre ?></h1> <!-- título de la página con el nombre del producto -->
 <div class="row g-4">
     <div class="col-md-4">
         <div class="border rounded p-3 text-center">
@@ -40,8 +40,7 @@ include __DIR__ . '/header.php';
             <dd class="col-sm-9"><?= number_format($p->precio, 2, ',', '.') ?> €</dd>
             <dt class="col-sm-3">Stock</dt>
             <dd class="col-sm-9"><?= (int)$p->stock ?></dd>
-            <dt class="col-sm-3">UUID</dt>
-            <dd class="col-sm-9"><code><?= $p->uuid ?></code></dd>
+
         </dl>
         <a class="btn btn-secondary" href="/index.php">Volver</a>
         <?php if ($session->hasRole('ADMIN')): ?>

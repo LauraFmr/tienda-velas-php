@@ -68,7 +68,7 @@ VALUES
 ('Arwen','Undómiel','admin','admin@velas.me',
 '$2y$10$9u2gPp4kZ1t0x1g2m3bT0Oq6b1N8f0n8vT7l1g2m3bT0Oq6b1N8f'), -- Admin1234! // Updated hash y new pass Admin123456
 ('Frodo','Baggins','usuario','frodo@velas.me',
-'$2y$10$8Yp9o7mB4N0gV3Q6e1x9uO1l3Jf8b2i7P5h6K3m0N9d2Q1a7Z5Wy'); -- User1234!
+'$2y$10$8Yp9o7mB4N0gV3Q6e1x9uO1l3Jf8b2i7P5h6K3m0N9d2Q1a7Z5Wy'); -- User1234! // User123456
 
 
 -- Asignación de roles

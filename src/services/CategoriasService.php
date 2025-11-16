@@ -18,8 +18,9 @@ class CategoriasService
     public function findAll(): array
     {
         $st = $this->pdo->query('SELECT * FROM categorias WHERE is_deleted=FALSE ORDER BY nombre ASC');
-        return array_map(function ($r) {
+
+        return array_map(function ($r): Categoria {
             return new Categoria($r['id'], $r['nombre'], $r['descripcion'], $r['created_at'], $r['updated_at'], $r['is_deleted']);
-        }, $st->fetchAll());
+        }, array: $st->fetchAll());
     }
 }
