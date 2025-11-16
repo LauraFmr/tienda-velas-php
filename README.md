@@ -1,6 +1,6 @@
-# 🕯️ Tienda de Velas - Velas de Fantasía
+# 🕯️ Proyecto Tienda Online de Velas de Fantasía
 
-Aplicación web CRUD para gestionar productos de una tienda de velas artesanales, desarrollada con **PHP 8.2**, **PostgreSQL** y **Docker**.
+Aplicación web CRUD para gestionar productos de una tienda de velas artesanales, desarrollada con **PHP 8.2**, **PostgreSQL** y despliegue con **Docker/Apache**.
 
 ---
 
@@ -8,7 +8,7 @@ Aplicación web CRUD para gestionar productos de una tienda de velas artesanales
 
 **Velas de Fantasía** es una tienda especializada en velas aromáticas inspiradas en temática de la Tierra Media. La aplicación permite:
 
-- ✅ Listar, crear, editar y eliminar productos
+- ✅ Listar, crear, editar y eliminar productos (Admin)
 - 🔐 Autenticación con roles (ADMIN, USER)
 - 🖼️ Gestión de imágenes de productos
 - 🔍 Búsqueda por nombre o descripción y filtrado por categoría y fragancia
@@ -26,8 +26,9 @@ Aplicación web CRUD para gestionar productos de una tienda de velas artesanales
 | Bootstrap | 5.3.3 | Frontend |
 | Composer | Latest | Gestor de dependencias |
 | Ramsey/UUID | 4.7 | Generación de UUIDs |
-| vlucas/phpdotenv | 5.6 | Variables de entorno |
-
+| vendor/vlucas/phpdotenv | 5.6 | Variables de entorno |
+| PDO (PHP Data Objects) | Built-in | Abstracción de acceso a BD (usado con PostgreSQL) |
+| Visual Studio Code | — | Editor usado para el desarrollo  (extensión PHP Intelephense) |
 
 ---
 
@@ -39,38 +40,111 @@ proyecto-php/
 │   ├── config/
 │   │   └── Config.php          # Configuración global (BD, rutas)
 │   ├── models/
-│   │   ├── Producto.php
-│   │   ├── Categoria.php
-│   │   ├── Fragancia.php
-│   │   ├── User.php
-│   │   └── Rol.php
+│   │   ├── Producto.php        # DTO: propiedades de un producto
+│   │   ├── Categoria.php       # DTO: categoría de productos
+│   │   ├── Fragancia.php       # DTO: fragancia/aroma
+│   │   ├── User.php            # DTO: usuario de la aplicación
+│   │   └── Rol.php             # DTO: rol de acceso (ADMIN, USER)
 │   ├── services/
-│   │   ├── ProductosService.php
-│   │   ├── CategoriasService.php
-│   │   ├── FraganciasService.php
-│   │   ├── UsersService.php
-│   │   ├── RolesServices.php
-│   │   └── SessionService.php
-│   ├── uploads/                # Almacenamiento de imágenes
-│   ├── header.php              # Encabezado HTML
-│   ├── footer.php              # Pie de página HTML
-│   ├── index.php               # Listado de productos
-│   ├── create.php              # Crear producto
-│   ├── details.php             # Detalles del producto
-│   ├── update.php              # Editar producto
-│   ├── update-image.php        # Actualizar imagen
-│   ├── delete.php              # Eliminar producto
-│   ├── login.php               # Autenticación
-│   └── logout.php              # Cerrar sesión
+│   │   ├── ProductosService.php       # CRUD de productos y búsquedas
+│   │   ├── CategoriasService.php      # CRUD de categorías
+│   │   ├── FraganciasService.php      # CRUD de fragancias
+│   │   ├── UsersService.php           # Autenticación y datos de usuario
+│   │   ├── RolesServices.php          # Gestión de roles
+│   │   └── SessionService.php         # Manejo de sesiones y timeouts
+│   ├── uploads/                # Almacenamiento de imágenes de productos, logo y favicon
+│   ├── header.php              # Encabezado HTML compartido
+│   ├── footer.php              # Pie de página HTML compartido
+│   ├── index.php               # Listado de productos con filtros
+│   ├── create.php              # Formulario para crear producto
+│   ├── details.php             # Ver detalles de un producto
+│   ├── update.php              # Formulario para editar producto
+│   ├── update-image.php        # Subida de imagen para producto
+│   ├── delete.php              # Eliminación de producto
+│   ├── login.php               # Autenticación de usuarios
+│   └── logout.php              # Cierre de sesión
 ├── database/
 │   └── init.sql                # Script de inicialización BD
-├── vendor/                     # Dependencias Composer
+├── vendor/                     # Dependencias Composer, generado con composer install
 ├── docker-compose.yml          # Orquestación de contenedores
 ├── Dockerfile                  # Construcción imagen PHP
 ├── composer.json               # Dependencias del proyecto
 ├── .env                        # Variables de entorno
 └── README.md                   # Este archivo
 ```
+
+### 📋 Detalles de Modelos y Servicios
+
+#### **Models** (Objetos de Datos)
+Los modelos son clases que representan las entidades principales del sistema. Actúan como **Data Transfer Objects (DTOs)** para pasar información entre servicios y páginas.
+
+- **Producto.php**
+  - Propiedades: id, uuid, nombre, descripción, precio, stock, imagen, categoriaId, categoriaNombre, fraganciaId, fraganciaNombre, timestamps
+  - Uso: Almacena toda la información de un producto individual con sus metadatos
+
+- **Categoria.php**
+  - Propiedades: id, nombre, descripción, timestamps
+  - Uso: Categoría de productos ("Velas", "Wax melts", "Accesorios")
+
+- **Fragancia.php**
+  - Propiedades: id, nombre, notas (descripción olfativa)
+  - Uso: Aroma/fragancia que pueden tener los productos
+
+- **User.php**
+  - Propiedades: id, nombre, apellido, username, email, password (hash bcrypt), timestamps, roles (array)
+  - Uso: Define el usuario del sistema con sus credenciales y roles asociados
+
+- **Rol.php**
+  - Propiedades: id, nombre (ADMIN, USER), descripción
+  - Uso: Define permisos/roles para controlar acceso a funcionalidades
+
+#### **Services** (Lógica de Negocio)
+Los servicios contienen la lógica de acceso a base de datos y operaciones de negocio. Reciben un objeto PDO en el constructor para conectarse a PostgreSQL.
+
+- **ProductosService.php**
+  - Métodos clave:
+    - `findAllWithFilters()`: Busca productos con filtros por nombre, categoría y fragancia
+    - `findById()`: Obtiene un producto específico por ID
+    - `create()`: Inserta un nuevo producto en BD
+    - `update()`: Modifica un producto existente
+    - `delete()`: Marca producto como eliminado (soft delete)
+    - `updateImage()`: Asigna imagen a un producto
+    - `mapProducto()`: Convierte fila de BD (snake_case) a objeto Producto (camelCase)
+
+- **CategoriasService.php**
+  - Métodos clave:
+    - `findAll()`: Lista todas las categorías no eliminadas
+    - `findById()`: Obtiene una categoría específica
+    - `create()`: Crea nueva categoría
+    - `delete()`: Marca categoría como eliminada
+
+- **FraganciasService.php**
+  - Métodos clave:
+    - `findAll()`: Lista todas las fragancias disponibles
+    - Operaciones CRUD (Create, Read, Update, Delete) para fragancias
+
+- **UsersService.php**
+  - Métodos clave:
+    - `authenticate()`: Verifica credenciales usando `password_verify()` con bcrypt
+    - `findUserByUsername()`: Busca usuario por nombre de usuario
+    - `findById()`: Obtiene datos del usuario
+    - `getRoles()`: Carga roles asociados al usuario desde la tabla `usuarios_roles`
+
+- **RolesServices.php**
+  - Métodos clave:
+    - `findAll()`: Lista todos los roles disponibles
+    - Gestión de asignación de roles a usuarios
+
+- **SessionService.php**
+  - **Patrón:** Singleton (única instancia durante toda la sesión HTTP)
+  - Métodos clave:
+    - `getInstance()`: Obtiene la única instancia del servicio de sesión
+    - `login()`: Registra usuario autenticado en sesión
+    - `logout()`: Cierra la sesión del usuario
+    - `isLoggedIn()`: Comprueba si hay usuario autenticado
+    - `getCurrentUser()`: Obtiene usuario actual
+    - `hasRole()`: Verifica si usuario tiene cierto rol
+    - `refresh()`: Reinicia el timeout de inactividad (1 hora)
 
 ---
 
@@ -79,7 +153,7 @@ proyecto-php/
 ### Requisitos Previos
 - Docker y Docker Compose instalados
 - Git (para clonar el repositorio)
-- Navegador web moderno
+- Navegador web 
 
 ### Pasos de Instalación
 
@@ -219,54 +293,6 @@ Los filtros se combinan con lógica AND en la consulta SQL.
 
 ---
 
-## 📝 API / Servicios Internos
-
-### ProductosService
-- `findAllWithFilters(?string $q, ?string $catId, ?string $fragId): array`
-- `findById(int $id): ?Producto`
-- `save(array $data): int`
-- `update(int $id, array $data): bool`
-- `updateImage(int $id, ?string $url): bool`
-- `deleteById(int $id): bool`
-
-### UsersService
-- `authenticate(string $username, string $password): User`
-- `findUserByUsername(string $username): ?User`
-
-### SessionService
-- `login(array $userData): void`
-- `logout(): void`
-- `isLoggedIn(): bool`
-- `user(): ?array`
-- `hasRole(string $role): bool`
-
----
-
-## 🐛 Posibles errores
-
-### Problema: "Usuario o contraseña incorrectos"
-**Solución:**
-- Verifica que has introducido la contraseña exacta (sensible a mayúsculas/minúsculas)
-- Comprueba en Adminer que el usuario existe en tabla `usuarios`
-- Genera un nuevo hash bcrypt y actualiza en BD:
-  ```bash
-  docker exec -i php_app php -r "echo password_hash('TuContraseña123', PASSWORD_BCRYPT);"
-  ```
-
-### Problema: Imágenes no se cargan
-**Solución:**
-- Verifica que existen en `src/uploads/`
-- Comprueba permisos: `docker exec php_app ls -l /var/www/html/src/uploads/`
-- Asegúrate de que la URL en BD es correcta: `/uploads/<nombre_archivo>`
-
-### Problema: "DB connection error"
-**Solución:**
-- Verifica que Postgres está funcionando: `docker-compose ps`
-- Comprueba variables en `.env`
-- Levanta de nuevo: `docker-compose down -v && docker-compose up -d --build`
-
----
-
 ## 📋 Lista de Características Implementadas
 
 - ✅ CRUD completo de productos
@@ -301,7 +327,3 @@ Este proyecto es de uso educativo. Distribuido bajo licencia **Creative Commons 
 **GitHub:** [https://github.com/LauraFmr/tienda-velas-php]  
 
 
----
-
-**Última actualización:** Noviembre 2025  
-**Estado:** ✅ Funcional
